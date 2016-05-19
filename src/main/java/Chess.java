@@ -5,7 +5,7 @@ public class Chess {
     /**
      * Main method for the chess game
      *
-     * @param args
+     * @param args arguments
      */
     public static void main(String[] args) {
         Board board = new Board();

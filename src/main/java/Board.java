@@ -152,10 +152,16 @@ class Board {
         blackKing = null;
     }
 
+    /**
+     * Check a given position is within the board
+     */
     private boolean outOfBoard(int rank, int file) {
         return rank < 0 || rank > Board.boardHeight || file < 0 || file > Board.boardWidth;
     }
 
+    /**
+     * Check a given player has any legal moves
+     */
     private boolean noLegalMoves(int playerId) {
         boolean noLegalMoves = true;
         ArrayList<Piece> playerPieces = playerId == Chess.WHITE ? whitePieces : blackPieces;
@@ -181,6 +187,9 @@ class Board {
         return noLegalMoves;
     }
 
+    /**
+     * Check the given player is checked after a specific move
+     */
     private boolean checkedAfterMove(int startRank, int startFile, int endRank, int endFile, int playerId, Piece startPiece, Piece endPiece) {
         boolean checkedAfterMove = false;
         updatePiecePosition(startRank, startFile, endRank, endFile, playerId, startPiece, endPiece);
@@ -190,6 +199,9 @@ class Board {
         return checkedAfterMove;
     }
 
+    /**
+     * Check the given player is checked
+     */
     private boolean checked(int playerId) {
         ArrayList<Piece> componentPieces = playerId == Chess.WHITE ? blackPieces : whitePieces;
         Piece playerKing = playerId == Chess.WHITE ? whiteKing : blackKing;
@@ -205,6 +217,9 @@ class Board {
         return checked;
     }
 
+    /**
+     * Update pieces after a move, used after checking the move is valid
+     */
     private void updatePiecePosition(int startRank, int startFile, int endRank, int endFile, int playerId, Piece startPiece, Piece endPiece) {
         if (endPiece != null) {
             ArrayList<Piece> componentPieces = 1 - playerId == Chess.WHITE ? whitePieces : blackPieces;
@@ -216,6 +231,9 @@ class Board {
         startPiece.file = endFile;
     }
 
+    /**
+     * Restore pieces after a move to before the move
+     */
     private void restorePiecePosition(int startRank, int startFile, int endRank, int endFile, int playerId, Piece startPiece, Piece endPiece) {
         if (endPiece != null) {
             ArrayList<Piece> componentPieces = 1 - playerId == Chess.WHITE ? whitePieces : blackPieces;
