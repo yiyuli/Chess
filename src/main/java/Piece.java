@@ -81,7 +81,7 @@ class Pawn extends Piece {
     static boolean isValidPawnMove(int startRank, int startFile, int endRank, int endFile, int playerId, Board board) {
         boolean pawnValidMove = false;
 
-        if (playerId == Chess.WHITE) {
+        if (playerId == Board.WHITE) {
             pawnValidMove |= (startFile == endFile && endRank - startRank == 2 && startRank == 1 && board.getSquare(endRank, endFile) == null);
             pawnValidMove |= (startFile == endFile && endRank - startRank == 1 && board.getSquare(endRank, endFile) == null);
             pawnValidMove |= (Math.abs(startFile - endFile) == 1 && endRank - startRank == 1 && board.getSquare(endRank, endFile) != null);

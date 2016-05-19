@@ -17,38 +17,38 @@ public class CheckmateAndStalemateTest {
 
     @Test
     public void checkmatedTest() {
-        King king = new King(0, 4, Chess.WHITE);
+        King king = new King(0, 4, Board.WHITE);
         board.addPiece(king);
-        Rook rook1 = new Rook(1, 0, Chess.BLACK);
-        Rook rook2 = new Rook(0, 0, Chess.BLACK);
+        Rook rook1 = new Rook(1, 0, Board.BLACK);
+        Rook rook2 = new Rook(0, 0, Board.BLACK);
         board.addPiece(rook1);
         board.addPiece(rook2);
-        int isCheckmated = board.checkCheckmatedOrStalemate(Chess.WHITE);
-        assertEquals(Chess.CHECKMATE, isCheckmated);
+        int isCheckmated = board.checkCheckmatedOrStalemate(Board.WHITE);
+        assertEquals(Board.CHECKMATE, isCheckmated);
     }
 
     @Test
     public void stalemateTest() {
-        King king = new King(0, 4, Chess.WHITE);
+        King king = new King(0, 4, Board.WHITE);
         board.addPiece(king);
-        Rook rook1 = new Rook(1, 0, Chess.BLACK);
-        Rook rook2 = new Rook(7, 3, Chess.BLACK);
-        Rook rook3 = new Rook(7, 5, Chess.BLACK);
+        Rook rook1 = new Rook(1, 0, Board.BLACK);
+        Rook rook2 = new Rook(7, 3, Board.BLACK);
+        Rook rook3 = new Rook(7, 5, Board.BLACK);
         board.addPiece(rook1);
         board.addPiece(rook2);
         board.addPiece(rook3);
-        int isStalemate = board.checkCheckmatedOrStalemate(Chess.WHITE);
-        assertEquals(Chess.STALEMATE, isStalemate);
+        int isStalemate = board.checkCheckmatedOrStalemate(Board.WHITE);
+        assertEquals(Board.STALEMATE, isStalemate);
     }
 
     @Test
     public void normalStateTest() {
-        King king = new King(0, 4, Chess.WHITE);
+        King king = new King(0, 4, Board.WHITE);
         board.addPiece(king);
-        Rook rook1 = new Rook(1, 0, Chess.BLACK);
+        Rook rook1 = new Rook(1, 0, Board.BLACK);
         board.addPiece(rook1);
-        int isNormalState = board.checkCheckmatedOrStalemate(Chess.WHITE);
-        assertEquals(Chess.NORMALSTATE, isNormalState);
+        int isNormalState = board.checkCheckmatedOrStalemate(Board.WHITE);
+        assertEquals(Board.NORMALSTATE, isNormalState);
     }
 
 }

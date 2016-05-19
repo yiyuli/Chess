@@ -4,6 +4,11 @@ import java.util.ArrayList;
  * Class to control the board. Used to add, move, remove pieces, and check whether a checkmate or stalemate occur
  */
 class Board {
+    static final int WHITE = 0;
+    static final int BLACK = 1;
+    static final int NORMALSTATE = 0;
+    static final int CHECKMATE = 1;
+    static final int STALEMATE = 2;
     static final int boardWidth = 8;
     static final int boardHeight = 8;
 
@@ -28,34 +33,34 @@ class Board {
         }
         /* initialize pawns for both sides */
         for (int file = 0; file < boardWidth; file++) {
-            squares[1][file] = new Pawn(1, file, Chess.WHITE);
+            squares[1][file] = new Pawn(1, file, WHITE);
             whitePieces.add(squares[1][file]);
         }
 
         for (int file = 0; file < boardWidth; file++) {
-            squares[6][file] = new Pawn(6, file, Chess.BLACK);
+            squares[6][file] = new Pawn(6, file, BLACK);
             blackPieces.add(squares[6][file]);
         }
         /* initialize the rest pieces */
-        squares[0][0] = new Rook(0, 0, Chess.WHITE);
-        squares[0][7] = new Rook(0, 7, Chess.WHITE);
-        squares[0][1] = new Knight(0, 1, Chess.WHITE);
-        squares[0][6] = new Knight(0, 6, Chess.WHITE);
-        squares[0][2] = new Bishop(0, 2, Chess.WHITE);
-        squares[0][5] = new Bishop(0, 5, Chess.WHITE);
-        squares[0][3] = new Queen(0, 3, Chess.WHITE);
-        squares[0][4] = new King(0, 4, Chess.WHITE);
+        squares[0][0] = new Rook(0, 0, WHITE);
+        squares[0][7] = new Rook(0, 7, WHITE);
+        squares[0][1] = new Knight(0, 1, WHITE);
+        squares[0][6] = new Knight(0, 6, WHITE);
+        squares[0][2] = new Bishop(0, 2, WHITE);
+        squares[0][5] = new Bishop(0, 5, WHITE);
+        squares[0][3] = new Queen(0, 3, WHITE);
+        squares[0][4] = new King(0, 4, WHITE);
         whiteKing = squares[0][4];
         for (int file = 0; file < boardWidth; file++) whitePieces.add(squares[0][file]);
 
-        squares[7][0] = new Rook(7, 0, Chess.BLACK);
-        squares[7][7] = new Rook(7, 7, Chess.BLACK);
-        squares[7][1] = new Knight(7, 1, Chess.BLACK);
-        squares[7][6] = new Knight(7, 6, Chess.BLACK);
-        squares[7][2] = new Bishop(7, 2, Chess.BLACK);
-        squares[7][5] = new Bishop(7, 5, Chess.BLACK);
-        squares[7][3] = new Queen(7, 3, Chess.BLACK);
-        squares[7][4] = new King(7, 4, Chess.BLACK);
+        squares[7][0] = new Rook(7, 0, BLACK);
+        squares[7][7] = new Rook(7, 7, BLACK);
+        squares[7][1] = new Knight(7, 1, BLACK);
+        squares[7][6] = new Knight(7, 6, BLACK);
+        squares[7][2] = new Bishop(7, 2, BLACK);
+        squares[7][5] = new Bishop(7, 5, BLACK);
+        squares[7][3] = new Queen(7, 3, BLACK);
+        squares[7][4] = new King(7, 4, BLACK);
         blackKing = squares[7][4];
         for (int file = 0; file < boardWidth; file++) blackPieces.add(squares[7][file]);
     }
@@ -97,12 +102,12 @@ class Board {
     int checkCheckmatedOrStalemate(int playerId) {
         if (noLegalMoves(playerId)) {
             if (checked(playerId))
-                return Chess.CHECKMATE;
+                return CHECKMATE;
             else
-                return Chess.STALEMATE;
+                return STALEMATE;
         }
 
-        return Chess.NORMALSTATE;
+        return NORMALSTATE;
     }
 
     /**
@@ -126,11 +131,11 @@ class Board {
         int rank = piece.rank;
         int file = piece.file;
         int playerId = piece.playerId;
-        ArrayList<Piece> playerPieces = playerId == Chess.WHITE ? whitePieces : blackPieces;
+        ArrayList<Piece> playerPieces = playerId == WHITE ? whitePieces : blackPieces;
         squares[rank][file] = piece;
         playerPieces.add(piece);
         if (piece instanceof King) {
-            if (playerId == Chess.WHITE)
+            if (playerId == WHITE)
                 whiteKing = piece;
             else
                 blackKing = piece;
@@ -164,7 +169,7 @@ class Board {
      */
     private boolean noLegalMoves(int playerId) {
         boolean noLegalMoves = true;
-        ArrayList<Piece> playerPieces = playerId == Chess.WHITE ? whitePieces : blackPieces;
+        ArrayList<Piece> playerPieces = playerId == WHITE ? whitePieces : blackPieces;
 
         outerLoop:
         for (Piece piece : playerPieces) {
@@ -203,8 +208,8 @@ class Board {
      * Check the given player is checked
      */
     private boolean checked(int playerId) {
-        ArrayList<Piece> componentPieces = playerId == Chess.WHITE ? blackPieces : whitePieces;
-        Piece playerKing = playerId == Chess.WHITE ? whiteKing : blackKing;
+        ArrayList<Piece> componentPieces = playerId == WHITE ? blackPieces : whitePieces;
+        Piece playerKing = playerId == WHITE ? whiteKing : blackKing;
         if (playerKing == null) return false;
         boolean checked = false;
         for (Piece piece : componentPieces) {
@@ -222,7 +227,7 @@ class Board {
      */
     private void updatePiecePosition(int startRank, int startFile, int endRank, int endFile, int playerId, Piece startPiece, Piece endPiece) {
         if (endPiece != null) {
-            ArrayList<Piece> componentPieces = 1 - playerId == Chess.WHITE ? whitePieces : blackPieces;
+            ArrayList<Piece> componentPieces = 1 - playerId == WHITE ? whitePieces : blackPieces;
             componentPieces.remove(endPiece);
         }
         squares[endRank][endFile] = startPiece;
@@ -236,7 +241,7 @@ class Board {
      */
     private void restorePiecePosition(int startRank, int startFile, int endRank, int endFile, int playerId, Piece startPiece, Piece endPiece) {
         if (endPiece != null) {
-            ArrayList<Piece> componentPieces = 1 - playerId == Chess.WHITE ? whitePieces : blackPieces;
+            ArrayList<Piece> componentPieces = 1 - playerId == WHITE ? whitePieces : blackPieces;
             componentPieces.add(endPiece);
         }
         squares[startRank][startFile] = startPiece;
