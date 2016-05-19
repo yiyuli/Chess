@@ -1,5 +1,8 @@
 import java.util.ArrayList;
 
+/**
+ * Class to control the board. Used to add, move, remove pieces, and check whether a checkmate or stalemate occur
+ */
 class Board {
     static final int boardWidth = 8;
     static final int boardHeight = 8;
@@ -10,6 +13,9 @@ class Board {
     private ArrayList<Piece> whitePieces;
     private ArrayList<Piece> blackPieces;
 
+    /**
+     * Constructor for board, used to initialize the board
+     */
     Board() {
         squares = new Piece[boardWidth][boardHeight];
         whitePieces = new ArrayList<Piece>();
@@ -54,6 +60,18 @@ class Board {
         for (int file = 0; file < boardWidth; file++) blackPieces.add(squares[7][file]);
     }
 
+    /**
+     * Determine whether a move is legal given the previous and current position. If not, return false.
+     * If Yes, move the piece and update the board.
+     *
+     * @param startRank row index of starting position
+     * @param startFile column index of starting position
+     * @param endRank row index of end position
+     * @param endFile column index of end position
+     * @param playerId determine the player
+     *
+     * @return boolean whether a move is successful
+     */
     boolean movePiece(int startRank, int startFile, int endRank, int endFile, int playerId) {
         /* check move is valid */
         if (outOfBoard(startRank, startFile) || outOfBoard(endRank, endFile)) return false;
@@ -70,6 +88,12 @@ class Board {
         return true;
     }
 
+    /**
+     * Check the game state
+     *
+     * @param playerId determine the player
+     * @return game state: checkmate, stalemate, normal state
+     */
     int checkCheckmatedOrStalemate(int playerId) {
         if (noLegalMoves(playerId)) {
             if (checked(playerId))
@@ -81,10 +105,23 @@ class Board {
         return Chess.NORMALSTATE;
     }
 
+    /**
+     * Return the piece given its position on the board
+     *
+     * @param rank  row index
+     * @param file column index
+     *
+     * @return piece object
+     */
     Piece getSquare(int rank, int file) {
         return squares[rank][file];
     }
 
+    /**
+     * Add a piece on the board
+     *
+     * @param piece piece to be added
+     */
     void addPiece(Piece piece) {
         int rank = piece.rank;
         int file = piece.file;
@@ -100,6 +137,9 @@ class Board {
         }
     }
 
+    /**
+     * Clear the board
+     */
     void clear() {
         for (int rank = 0; rank < boardHeight; rank++) {
             for (int file = 0; file < boardWidth; file++) {

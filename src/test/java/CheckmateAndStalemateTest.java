@@ -3,6 +3,9 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * Tests for checking the game state: checkmate, stalemate, normal state.
+ */
 public class CheckmateAndStalemateTest {
     private Board board;
 

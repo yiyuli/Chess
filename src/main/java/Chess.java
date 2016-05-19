@@ -1,5 +1,12 @@
+/**
+ * Class for starting, controlling, and ending the game
+ */
 public class Chess {
-
+    /**
+     * Main method for the chess game
+     *
+     * @param args
+     */
     public static void main(String[] args) {
         Board board = new Board();
         int currentPlayer = Chess.WHITE;

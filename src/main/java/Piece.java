@@ -1,14 +1,35 @@
+/**
+ * Abstract class for all pieces
+ */
 abstract class Piece {
     int rank;
     int file;
     int playerId;
 
+    /**
+     * Constructor for pieces
+     *
+     * @param rank     row index
+     * @param file     column index
+     * @param playerId determine the player
+     */
     Piece(int rank, int file, int playerId) {
         this.rank = rank;
         this.file = file;
         this.playerId = playerId;
     }
 
+    /**
+     * Determine whether the move is legal
+     *
+     * @param startRank row index of starting position
+     * @param startFile column index of starting position
+     * @param endRank   row index of end position
+     * @param endFile   column index of end position
+     * @param playerId  determine the player
+     * @param board     store the board information, used to check if there is obstacle
+     * @return boolean whether the move is legal
+     */
     boolean isValidMove(int startRank, int startFile, int endRank, int endFile, int playerId, Board board) {
         boolean diffPlayerStartPlace = this.playerId != playerId;
         boolean notMoving = startRank == endRank && startFile == endFile;
@@ -26,9 +47,38 @@ class Pawn extends Piece {
         super(rank, file, playerId);
     }
 
+    /**
+     * Determine whether the move is legal
+     *
+     * @param startRank row index of starting position
+     * @param startFile column index of starting position
+     * @param endRank   row index of end position
+     * @param endFile   column index of end position
+     * @param playerId  determine the player
+     * @param board     store the board information, used to check if there is obstacle
+     * @return boolean whether the move is legal
+     */
     @Override
     boolean isValidMove(int startRank, int startFile, int endRank, int endFile, int playerId, Board board) {
         boolean basicChecking = super.isValidMove(startRank, startFile, endRank, endFile, playerId, board);
+        boolean pawnValidMove = isValidPawnMove(startRank, startFile, endRank, endFile, playerId, board);
+
+        return basicChecking && pawnValidMove;
+    }
+
+    /**
+     * /**
+     * Check whether a move satisfies the rule of a pawn
+     *
+     * @param startRank row index of starting position
+     * @param startFile column index of starting position
+     * @param endRank   row index of end position
+     * @param endFile   column index of end position
+     * @param playerId  determine the player
+     * @param board     store the board information, used to check if there is obstacle
+     * @return boolean whether the move is legal
+     */
+    static boolean isValidPawnMove(int startRank, int startFile, int endRank, int endFile, int playerId, Board board) {
         boolean pawnValidMove = false;
 
         if (playerId == Chess.WHITE) {
@@ -40,8 +90,7 @@ class Pawn extends Piece {
             pawnValidMove |= (startFile == endFile && endRank - startRank == -1 && board.getSquare(endRank, endFile) == null);
             pawnValidMove |= (Math.abs(startFile - endFile) == 1 && endRank - startRank == -1 && board.getSquare(endRank, endFile) != null);
         }
-
-        return basicChecking && pawnValidMove;
+        return pawnValidMove;
     }
 
 }
@@ -51,6 +100,17 @@ class Rook extends Piece {
         super(rank, file, playerId);
     }
 
+    /**
+     * Determine whether the move is legal
+     *
+     * @param startRank row index of starting position
+     * @param startFile column index of starting position
+     * @param endRank   row index of end position
+     * @param endFile   column index of end position
+     * @param playerId  determine the player
+     * @param board     store the board information, used to check if there is obstacle
+     * @return boolean whether the move is legal
+     */
     @Override
     boolean isValidMove(int startRank, int startFile, int endRank, int endFile, int playerId, Board board) {
         boolean basicChecking = super.isValidMove(startRank, startFile, endRank, endFile, playerId, board);
@@ -59,6 +119,16 @@ class Rook extends Piece {
         return basicChecking && rookValidMove;
     }
 
+    /**
+     * Check whether a move satisfies the rule of a rook
+     *
+     * @param startRank row index of starting position
+     * @param startFile column index of starting position
+     * @param endRank   row index of end position
+     * @param endFile   column index of end position
+     * @param board     store the board information, used to check if there is obstacle
+     * @return boolean whether the move is legal
+     */
     static boolean isValidRookMove(int startRank, int startFile, int endRank, int endFile, Board board) {
         boolean validMove = startRank == endRank || startFile == endFile;
         boolean noObstacle = true;
@@ -77,25 +147,66 @@ class Rook extends Piece {
     }
 }
 
+/**
+ * Class for Knight piece
+ */
 class Knight extends Piece {
     protected Knight(int rank, int file, int playerId) {
         super(rank, file, playerId);
     }
 
+    /**
+     * Determine whether the move is legal
+     *
+     * @param startRank row index of starting position
+     * @param startFile column index of starting position
+     * @param endRank   row index of end position
+     * @param endFile   column index of end position
+     * @param playerId  determine the player
+     * @param board     store the board information, used to check if there is obstacle
+     * @return boolean whether the move is legal
+     */
     @Override
     boolean isValidMove(int startRank, int startFile, int endRank, int endFile, int playerId, Board board) {
         boolean basicChecking = super.isValidMove(startRank, startFile, endRank, endFile, playerId, board);
-        boolean knightValidMove = Math.pow(Math.abs(startRank - endRank), 2) + Math.pow(Math.abs(startFile - endFile), 2) == 5;
+        boolean knightValidMove = isValidKnightMove(startRank, startFile, endRank, endFile);
 
         return basicChecking && knightValidMove;
     }
+
+    /**
+     * Check whether a move satisfies the rule of a Knight
+     *
+     * @param startRank row index of starting position
+     * @param startFile column index of starting position
+     * @param endRank   row index of end position
+     * @param endFile   column index of end position
+     * @return boolean whether the move is legal
+     */
+    static boolean isValidKnightMove(int startRank, int startFile, int endRank, int endFile) {
+        return Math.pow(Math.abs(startRank - endRank), 2) + Math.pow(Math.abs(startFile - endFile), 2) == 5;
+    }
 }
 
+/**
+ * Class for Bishop piece
+ */
 class Bishop extends Piece {
     protected Bishop(int rank, int file, int playerId) {
         super(rank, file, playerId);
     }
 
+    /**
+     * Check whether the move is legal
+     *
+     * @param startRank row index of starting position
+     * @param startFile column index of starting position
+     * @param endRank   row index of end position
+     * @param endFile   column index of end position
+     * @param playerId  determine the player
+     * @param board     store the board information, used to check if there is obstacle
+     * @return boolean whether the move is legal
+     */
     @Override
     boolean isValidMove(int startRank, int startFile, int endRank, int endFile, int playerId, Board board) {
         boolean basicChecking = super.isValidMove(startRank, startFile, endRank, endFile, playerId, board);
@@ -104,6 +215,16 @@ class Bishop extends Piece {
         return basicChecking && bishopValidMove;
     }
 
+    /**
+     * Check whether a move satisfies the rule of a bishop
+     *
+     * @param startRank row index of starting position
+     * @param startFile column index of starting position
+     * @param endRank   row index of end position
+     * @param endFile   column index of end position
+     * @param board     store the board information, used to check if there is obstacle
+     * @return boolean whether the move is legal
+     */
     static boolean isValidBishopMove(int startRank, int startFile, int endRank, int endFile, Board board) {
         boolean validMove = Math.abs(startRank - endRank) == Math.abs(startFile - endFile);
         boolean noObstacle = true;
@@ -122,11 +243,25 @@ class Bishop extends Piece {
     }
 }
 
+/**
+ * Class for Queen piece
+ */
 class Queen extends Piece {
     protected Queen(int rank, int file, int playerId) {
         super(rank, file, playerId);
     }
 
+    /**
+     * Determine whether the move is legal
+     *
+     * @param startRank row index of starting position
+     * @param startFile column index of starting position
+     * @param endRank   row index of end position
+     * @param endFile   column index of end position
+     * @param playerId  determine the player
+     * @param board     store the board information, used to check if there is obstacle
+     * @return boolean whether the move is legal
+     */
     @Override
     boolean isValidMove(int startRank, int startFile, int endRank, int endFile, int playerId, Board board) {
         boolean basicChecking = super.isValidMove(startRank, startFile, endRank, endFile, playerId, board);
@@ -138,17 +273,44 @@ class Queen extends Piece {
     }
 }
 
+/**
+ * Class for King piece
+ */
 class King extends Piece {
     protected King(int rank, int file, int playerId) {
         super(rank, file, playerId);
     }
 
+    /**
+     * Determine whether the move is legal
+     *
+     * @param startRank row index of starting position
+     * @param startFile column index of starting position
+     * @param endRank   row index of end position
+     * @param endFile   column index of end position
+     * @param playerId  determine the player
+     * @param board     store the board information, used to check if there is obstacle
+     * @return boolean whether the move is legal
+     */
     @Override
     boolean isValidMove(int startRank, int startFile, int endRank, int endFile, int playerId, Board board) {
         boolean basicChecking = super.isValidMove(startRank, startFile, endRank, endFile, playerId, board);
-        boolean kingValidMove = Math.abs(startRank - endRank) <= 1 && Math.abs(startFile - endFile) <= 1;
+        boolean kingValidMove = isKingValidMove(startRank, startFile, endRank, endFile);
 
         return basicChecking && kingValidMove;
+    }
+
+    /**
+     * Check whether a move satisfies the rule of a king
+     *
+     * @param startRank row index of starting position
+     * @param startFile column index of starting position
+     * @param endRank   row index of end position
+     * @param endFile   column index of end position
+     * @return boolean whether the move is legal
+     */
+    static boolean isKingValidMove(int startRank, int startFile, int endRank, int endFile) {
+        return Math.abs(startRank - endRank) <= 1 && Math.abs(startFile - endFile) <= 1;
     }
 }
 
