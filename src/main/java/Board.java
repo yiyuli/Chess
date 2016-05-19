@@ -12,6 +12,8 @@ class Board {
 
     Board() {
         squares = new Piece[boardWidth][boardHeight];
+        whitePieces = new ArrayList<Piece>();
+        blackPieces = new ArrayList<Piece>();
         /* initialize empty squares */
         for (int rank = 2; rank < 6; rank++) {
             for (int file = 0; file < boardWidth; file++) {
@@ -52,47 +54,136 @@ class Board {
         for (int file = 0; file < boardWidth; file++) blackPieces.add(squares[7][file]);
     }
 
-    boolean updateBoard(int startRank, int startFile, int endRank, int endFile, int playerId) {
+    boolean movePiece(int startRank, int startFile, int endRank, int endFile, int playerId) {
         /* check move is valid */
-        Piece piece = squares[startRank][startFile];
-        if (piece == null) return false;
-        if (!piece.isValidMove(startRank, startFile, endRank, endFile, playerId, this)) return false;
+        if (outOfBoard(startRank, startFile) || outOfBoard(endRank, endFile)) return false;
+        Piece startPiece = squares[startRank][startFile];
+        Piece endPiece = squares[endRank][endFile];
 
-        /* update the new move */
-        if (squares[endRank][endFile] != null) {
-            ArrayList<Piece> componentPieces = 1 - playerId == Chess.WHITE ? whitePieces : blackPieces;
-            componentPieces.remove(squares[endRank][endFile]);
-        }
-        squares[endRank][endFile] = piece;
-        squares[startRank][startFile] = null;
+        if (startPiece == null) return false;
+        if (!startPiece.isValidMove(startRank, startFile, endRank, endFile, playerId, this)) return false;
+        if (checkedAfterMove(startRank, startFile, endRank, endFile, playerId, startPiece, endPiece)) return false;
+
+        /* update piece position */
+        updatePiecePosition(startRank, startFile, endRank, endFile, playerId, startPiece, endPiece);
 
         return true;
     }
 
-    boolean checkCheckmatedOrStalemate(int playerId) {
-        boolean checkmatedOrStalemate = false;
+    int checkCheckmatedOrStalemate(int playerId) {
         if (noLegalMoves(playerId)) {
-            if (checked(playerId)) {
-                checkmatedOrStalemate = true;
-            } else {
-                checkmatedOrStalemate = true;
-            }
+            if (checked(playerId))
+                return Chess.CHECKMATE;
+            else
+                return Chess.STALEMATE;
         }
 
-        return checkmatedOrStalemate;
+        return Chess.NORMALSTATE;
     }
 
     Piece getSquare(int rank, int file) {
         return squares[rank][file];
     }
 
-    private boolean noLegalMoves(int playerId) {
+    void addPiece(Piece piece) {
+        int rank = piece.rank;
+        int file = piece.file;
+        int playerId = piece.playerId;
+        ArrayList<Piece> playerPieces = playerId == Chess.WHITE ? whitePieces : blackPieces;
+        squares[rank][file] = piece;
+        playerPieces.add(piece);
+        if (piece instanceof King) {
+            if (playerId == Chess.WHITE)
+                whiteKing = piece;
+            else
+                blackKing = piece;
+        }
+    }
 
-        return false;
+    void clear() {
+        for (int rank = 0; rank < boardHeight; rank++) {
+            for (int file = 0; file < boardWidth; file++) {
+                squares[rank][file] = null;
+            }
+        }
+        whitePieces.clear();
+        blackPieces.clear();
+        whiteKing = null;
+        blackKing = null;
+    }
+
+    private boolean outOfBoard(int rank, int file) {
+        return rank < 0 || rank > Board.boardHeight || file < 0 || file > Board.boardWidth;
+    }
+
+    private boolean noLegalMoves(int playerId) {
+        boolean noLegalMoves = true;
+        ArrayList<Piece> playerPieces = playerId == Chess.WHITE ? whitePieces : blackPieces;
+
+        outerLoop:
+        for (Piece piece : playerPieces) {
+            int startRank = piece.rank;
+            int startFile = piece.file;
+            for (int rank = 0; rank < boardHeight; rank++) {
+                for (int file = 0; file < boardWidth; file++) {
+                    if (piece.isValidMove(startRank, startFile, rank, file, playerId, this)) {
+                        Piece startPiece = squares[startRank][startFile];
+                        Piece endPiece = squares[rank][file];
+                        if (!checkedAfterMove(startRank, startFile, rank, file, playerId, startPiece, endPiece)) {
+                            noLegalMoves = false;
+                            break outerLoop;
+                        }
+                    }
+                }
+            }
+        }
+
+        return noLegalMoves;
+    }
+
+    private boolean checkedAfterMove(int startRank, int startFile, int endRank, int endFile, int playerId, Piece startPiece, Piece endPiece) {
+        boolean checkedAfterMove = false;
+        updatePiecePosition(startRank, startFile, endRank, endFile, playerId, startPiece, endPiece);
+        if (checked(playerId)) checkedAfterMove = true;
+        restorePiecePosition(startRank, startFile, endRank, endFile, playerId, startPiece, endPiece);
+
+        return checkedAfterMove;
     }
 
     private boolean checked(int playerId) {
+        ArrayList<Piece> componentPieces = playerId == Chess.WHITE ? blackPieces : whitePieces;
+        Piece playerKing = playerId == Chess.WHITE ? whiteKing : blackKing;
+        if (playerKing == null) return false;
+        boolean checked = false;
+        for (Piece piece : componentPieces) {
+            if (piece.isValidMove(piece.rank, piece.file, playerKing.rank, playerKing.file, 1 - playerId, this)) {
+                checked = true;
+                break;
+            }
+        }
 
-        return false;
+        return checked;
+    }
+
+    private void updatePiecePosition(int startRank, int startFile, int endRank, int endFile, int playerId, Piece startPiece, Piece endPiece) {
+        if (endPiece != null) {
+            ArrayList<Piece> componentPieces = 1 - playerId == Chess.WHITE ? whitePieces : blackPieces;
+            componentPieces.remove(endPiece);
+        }
+        squares[endRank][endFile] = startPiece;
+        squares[startRank][startFile] = null;
+        startPiece.rank = endRank;
+        startPiece.file = endFile;
+    }
+
+    private void restorePiecePosition(int startRank, int startFile, int endRank, int endFile, int playerId, Piece startPiece, Piece endPiece) {
+        if (endPiece != null) {
+            ArrayList<Piece> componentPieces = 1 - playerId == Chess.WHITE ? whitePieces : blackPieces;
+            componentPieces.add(endPiece);
+        }
+        squares[startRank][startFile] = startPiece;
+        squares[endRank][endFile] = endPiece;
+        startPiece.rank = startRank;
+        startPiece.file = startFile;
     }
 }

@@ -1,14 +1,8 @@
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-/**
- * Runs all tests for classes in the <code>contactInfo</code> package
- * @author Jerome Bell
- *
- */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({AllChessMechanismTest.class})
+@Suite.SuiteClasses({PieceValidMoveTest.class, CheckmateAndStalemateTest.class})
 public class AllChessMechanismTest {
-
 
 }

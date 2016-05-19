@@ -9,14 +9,16 @@ public class Chess {
         int endRank = 0;
         int endFile = 0;
         //
-        while (!board.checkCheckmatedOrStalemate(currentPlayer)) {
-            board.updateBoard(startRank, startFile, endRank, endFile, currentPlayer);
+        while (board.checkCheckmatedOrStalemate(currentPlayer) == Chess.NORMALSTATE) {
+            board.movePiece(startRank, startFile, endRank, endFile, currentPlayer);
             currentPlayer = 1 - currentPlayer;
         }
         // currentPlayer is checkMated and lost
     }
 
-    public static final int WHITE = 0;
-    public static final int BLACK = 1;
-
+    static final int WHITE = 0;
+    static final int BLACK = 1;
+    static final int CHECKMATE = 1;
+    static final int STALEMATE = 2;
+    static final int NORMALSTATE = 0;
 }

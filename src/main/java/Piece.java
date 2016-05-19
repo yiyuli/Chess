@@ -10,16 +10,14 @@ abstract class Piece {
     }
 
     boolean isValidMove(int startRank, int startFile, int endRank, int endFile, int playerId, Board board) {
-        boolean outOfBoard = outOfBoard(startRank, startFile) || outOfBoard(endRank, endFile);
         boolean diffPlayerStartPlace = this.playerId != playerId;
         boolean notMoving = startRank == endRank && startFile == endFile;
-        boolean samePlayerEndPlace = this.playerId == board.getSquare(endRank, endFile).playerId;
+        boolean samePlayerEndPlace = false;
+        if (board.getSquare(endRank, endFile) != null) {
+            samePlayerEndPlace = this.playerId == board.getSquare(endRank, endFile).playerId;
+        }
 
-        return !(outOfBoard || diffPlayerStartPlace || notMoving || samePlayerEndPlace);
-    }
-
-    private boolean outOfBoard(int rank, int file) {
-        return rank < 0 || rank > Board.boardHeight || file < 0 || file > Board.boardWidth;
+        return !(diffPlayerStartPlace || notMoving || samePlayerEndPlace);
     }
 }
 
@@ -34,12 +32,12 @@ class Pawn extends Piece {
         boolean pawnValidMove = false;
 
         if (playerId == Chess.WHITE) {
-            pawnValidMove |= (startFile == endFile && endRank - startRank == 2 && startRank == 1);
-            pawnValidMove |= (startFile == endFile && endRank - startRank == 1);
+            pawnValidMove |= (startFile == endFile && endRank - startRank == 2 && startRank == 1 && board.getSquare(endRank, endFile) == null);
+            pawnValidMove |= (startFile == endFile && endRank - startRank == 1 && board.getSquare(endRank, endFile) == null);
             pawnValidMove |= (Math.abs(startFile - endFile) == 1 && endRank - startRank == 1 && board.getSquare(endRank, endFile) != null);
         } else {
-            pawnValidMove |= (startFile == endFile && endRank - startRank == -2 && startRank == 6);
-            pawnValidMove |= (startFile == endFile && endRank - startRank == -1);
+            pawnValidMove |= (startFile == endFile && endRank - startRank == -2 && startRank == 6 && board.getSquare(endRank, endFile) == null);
+            pawnValidMove |= (startFile == endFile && endRank - startRank == -1 && board.getSquare(endRank, endFile) == null);
             pawnValidMove |= (Math.abs(startFile - endFile) == 1 && endRank - startRank == -1 && board.getSquare(endRank, endFile) != null);
         }
 
@@ -109,11 +107,12 @@ class Bishop extends Piece {
     static boolean isValidBishopMove(int startRank, int startFile, int endRank, int endFile, Board board) {
         boolean validMove = Math.abs(startRank - endRank) == Math.abs(startFile - endFile);
         boolean noObstacle = true;
-        int startingRank = startRank < endRank ? startRank : endRank;
-        int startingFile = startFile < endFile ? startFile : endFile;
+        int smallerRank = startRank < endRank ? startRank : endRank;
+        int smallerFile = startFile < endFile ? startFile : endFile;
+        int smallerDiff = Math.abs(startRank - endRank) < Math.abs(startFile - endFile) ? Math.abs(startRank - endRank) : Math.abs(startFile - endFile);
 
-        for (int diagonalDistance = 1; diagonalDistance < Math.abs(startRank - endRank); diagonalDistance++) {
-            if (board.getSquare(startingRank + diagonalDistance, startingFile + diagonalDistance) != null) {
+        for (int diagonalDistance = 1; diagonalDistance < smallerDiff; diagonalDistance++) {
+            if (board.getSquare(smallerRank + diagonalDistance, smallerFile + diagonalDistance) != null) {
                 noObstacle = false;
                 break;
             }
