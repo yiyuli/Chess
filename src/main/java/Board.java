@@ -3,7 +3,7 @@ import java.util.ArrayList;
 /**
  * Class to control the board. Used to add, move, remove pieces, and check whether a checkmate or stalemate occur
  */
-class Board {
+public class Board {
     static final int WHITE = 0;
     static final int BLACK = 1;
     static final int NORMALSTATE = 0;
@@ -13,8 +13,8 @@ class Board {
     static final int boardHeight = 8;
 
     private Piece[][] squares;
-    private Piece whiteKing;
-    private Piece blackKing;
+    private Piece whiteKing = null;
+    private Piece blackKing = null;
     private ArrayList<Piece> whitePieces;
     private ArrayList<Piece> blackPieces;
 
@@ -25,7 +25,15 @@ class Board {
         squares = new Piece[boardWidth][boardHeight];
         whitePieces = new ArrayList<Piece>();
         blackPieces = new ArrayList<Piece>();
-        /* initialize empty squares */
+
+        init();
+    }
+
+    /**
+     * Initialize board helper function
+     */
+    void init() {
+    /* initialize empty squares */
         for (int rank = 2; rank < 6; rank++) {
             for (int file = 0; file < boardWidth; file++) {
                 squares[rank][file] = null;
@@ -71,10 +79,9 @@ class Board {
      *
      * @param startRank row index of starting position
      * @param startFile column index of starting position
-     * @param endRank row index of end position
-     * @param endFile column index of end position
-     * @param playerId determine the player
-     *
+     * @param endRank   row index of end position
+     * @param endFile   column index of end position
+     * @param playerId  determine the player
      * @return boolean whether a move is successful
      */
     boolean movePiece(int startRank, int startFile, int endRank, int endFile, int playerId) {
@@ -113,9 +120,8 @@ class Board {
     /**
      * Return the piece given its position on the board
      *
-     * @param rank  row index
+     * @param rank row index
      * @param file column index
-     *
      * @return piece object
      */
     Piece getSquare(int rank, int file) {
