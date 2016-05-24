@@ -1,2 +1,2 @@
 # Chess
-A Chess Game.
+A Chess Game written in Java.
