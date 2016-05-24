@@ -9,6 +9,7 @@ public class Board {
     static final int NORMALSTATE = 0;
     static final int CHECKMATE = 1;
     static final int STALEMATE = 2;
+    static final int CHECKED = 3;
     static final int boardWidth = 8;
     static final int boardHeight = 8;
 
@@ -107,14 +108,17 @@ public class Board {
      * @return game state: checkmate, stalemate, normal state
      */
     int checkCheckmatedOrStalemate(int playerId) {
-        if (noLegalMoves(playerId)) {
-            if (checked(playerId))
-                return CHECKMATE;
-            else
-                return STALEMATE;
+        boolean noLegalMoves = noLegalMoves(playerId);
+        boolean checked = checked(playerId);
+        if (noLegalMoves && checked) {
+            return CHECKMATE;
+        } else if (noLegalMoves) {
+            return STALEMATE;
+        } else if (checked) {
+            return CHECKED;
+        }else{
+            return NORMALSTATE;
         }
-
-        return NORMALSTATE;
     }
 
     /**

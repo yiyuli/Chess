@@ -3,14 +3,17 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class ChessController {
+    private ChessController controller = this;
     private Board board;
     private JFrame frame;
-    private ChessView view;
     private boolean game_started = false;
-    private JButton pieceToMove = new JButton();
-    private int currentPlayer;
     private int whiteScore = 0;
     private int blackScore = 0;
+    private CommandManager commandManager = new CommandManager();
+
+    ChessView view;
+    JButton pieceToMove = new JButton();
+    int currentPlayer;
 
     public void init() {
         board = new Board();
@@ -38,7 +41,7 @@ public class ChessController {
         view.addResignListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int confirm = JOptionPane.showConfirmDialog(frame, "Are you sure to reisgn?", "Reisgn", JOptionPane.YES_NO_OPTION);
+                int confirm = JOptionPane.showConfirmDialog(frame, "Are you sure to resign?", "Resign", JOptionPane.YES_NO_OPTION);
                 if (confirm == 0) {
                     if (currentPlayer == Board.WHITE) blackScore++;
                     else whiteScore++;
@@ -50,7 +53,11 @@ public class ChessController {
         view.addUndoListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                if (commandManager.isUndoAvailable()) {
+                    commandManager.undo();
+                } else {
+                    JOptionPane.showMessageDialog(null, "Unable to undo.");
+                }
             }
         });
     }
@@ -70,28 +77,16 @@ public class ChessController {
                     int endRank = 7 - pieceMovedPosition / 8;
                     int endFile = pieceMovedPosition % 8;
                     if (board.movePiece(startRank, startFile, endRank, endFile, currentPlayer)) {
+                        commandManager.executeCommand(new MovePieceCommand(controller, button));
+                        /*
                         button.setIcon(pieceToMove.getIcon());
                         pieceToMove.setIcon(null);
                         currentPlayer = currentPlayer == Board.WHITE ? Board.BLACK : Board.WHITE;
                         String player = currentPlayer == Board.WHITE ? "White" : "Black";
                         view.updateMessage(player + " player's turn");
-                        int gameState = board.checkCheckmatedOrStalemate(currentPlayer);
-                        switch (gameState) {
-                            case Board.CHECKMATE:
-                                JOptionPane.showMessageDialog(null, player + " is checkmated");
-                                if (currentPlayer == Board.WHITE) blackScore++;
-                                else whiteScore++;
-                                resetGame();
-                                break;
-                            case Board.STALEMATE:
-                                JOptionPane.showMessageDialog(null, "Stalemate");
-                                resetGame();
-                                break;
-                            case Board.NORMALSTATE:
-                                break;
-                            default:
-                                break;
-                        }
+                        */
+                        String player = currentPlayer == Board.WHITE ? "White" : "Black";
+                        detectGameState(player);
                     } else {
                         JOptionPane.showMessageDialog(frame, "Illegal Move.", "Warning", JOptionPane.WARNING_MESSAGE);
                     }
@@ -99,6 +94,29 @@ public class ChessController {
                 }
             }
         });
+    }
+
+    private void detectGameState(String player) {
+        int gameState = board.checkCheckmatedOrStalemate(currentPlayer);
+        switch (gameState) {
+            case Board.CHECKMATE:
+                JOptionPane.showMessageDialog(null, player + " is checkmated");
+                if (currentPlayer == Board.WHITE) blackScore++;
+                else whiteScore++;
+                resetGame();
+                break;
+            case Board.STALEMATE:
+                JOptionPane.showMessageDialog(null, "Stalemate");
+                resetGame();
+                break;
+            case Board.CHECKED:
+                JOptionPane.showMessageDialog(null, player + " is checked");
+                break;
+            case Board.NORMALSTATE:
+                break;
+            default:
+                break;
+        }
     }
 
     private void resetGame() {
@@ -112,6 +130,7 @@ public class ChessController {
         display();
         board.clear();
         board.init();
+        commandManager = new CommandManager();
     }
 
     private void display() {
