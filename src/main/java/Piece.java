@@ -314,4 +314,58 @@ class King extends Piece {
     }
 }
 
+class Empress extends Piece{
+    protected Empress(int rank, int file, int playerId) {
+        super(rank, file, playerId);
+    }
+
+    /**
+     * Determine whether the move is legal
+     *
+     * @param startRank row index of starting position
+     * @param startFile column index of starting position
+     * @param endRank   row index of end position
+     * @param endFile   column index of end position
+     * @param playerId  determine the player
+     * @param board     store the board information, used to check if there is obstacle
+     * @return boolean whether the move is legal
+     */
+    @Override
+    boolean isValidMove(int startRank, int startFile, int endRank, int endFile, int playerId, Board board) {
+        boolean basicChecking = super.isValidMove(startRank, startFile, endRank, endFile, playerId, board);
+        boolean isValidRookMove = Rook.isValidRookMove(startRank, startFile, endRank, endFile, board);
+        boolean isValidKnightMove = Knight.isValidKnightMove(startRank, startFile, endRank, endFile);
+        boolean empressValidMove = isValidRookMove || isValidKnightMove;
+
+        return basicChecking && empressValidMove;
+    }
+}
+
+class Princess extends Piece{
+    protected Princess(int rank, int file, int playerId) {
+        super(rank, file, playerId);
+    }
+
+    /**
+     * Determine whether the move is legal
+     *
+     * @param startRank row index of starting position
+     * @param startFile column index of starting position
+     * @param endRank   row index of end position
+     * @param endFile   column index of end position
+     * @param playerId  determine the player
+     * @param board     store the board information, used to check if there is obstacle
+     * @return boolean whether the move is legal
+     */
+    @Override
+    boolean isValidMove(int startRank, int startFile, int endRank, int endFile, int playerId, Board board) {
+        boolean basicChecking = super.isValidMove(startRank, startFile, endRank, endFile, playerId, board);
+        boolean isValidKnightMove = Knight.isValidKnightMove(startRank, startFile, endRank, endFile);
+        boolean isValidBishopMove = Bishop.isValidBishopMove(startRank, startFile, endRank, endFile, board);
+        boolean princessValidMove = isValidKnightMove || isValidBishopMove;
+
+        return basicChecking && princessValidMove;
+    }
+}
+
 

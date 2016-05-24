@@ -85,7 +85,7 @@ public class Board {
      * @param playerId  determine the player
      * @return boolean whether a move is successful
      */
-    boolean movePiece(int startRank, int startFile, int endRank, int endFile, int playerId) {
+    boolean canMovePiece(int startRank, int startFile, int endRank, int endFile, int playerId) {
         /* check move is valid */
         if (outOfBoard(startRank, startFile) || outOfBoard(endRank, endFile)) return false;
         Piece startPiece = squares[startRank][startFile];
@@ -95,17 +95,21 @@ public class Board {
         if (!startPiece.isValidMove(startRank, startFile, endRank, endFile, playerId, this)) return false;
         if (checkedAfterMove(startRank, startFile, endRank, endFile, playerId, startPiece, endPiece)) return false;
 
+        return true;
+    }
+
+    void movePiece(int startRank, int startFile, int endRank, int endFile, int playerId) {
+        Piece startPiece = squares[startRank][startFile];
+        Piece endPiece = squares[endRank][endFile];
         /* update piece position */
         updatePiecePosition(startRank, startFile, endRank, endFile, playerId, startPiece, endPiece);
-
-        return true;
     }
 
     /**
      * Check the game state
      *
      * @param playerId determine the player
-     * @return game state: checkmate, stalemate, normal state
+     * @return game state: checked, checkmate, stalemate, normal state
      */
     int checkCheckmatedOrStalemate(int playerId) {
         boolean noLegalMoves = noLegalMoves(playerId);
@@ -235,7 +239,7 @@ public class Board {
     /**
      * Update pieces after a move, used after checking the move is valid
      */
-    private void updatePiecePosition(int startRank, int startFile, int endRank, int endFile, int playerId, Piece startPiece, Piece endPiece) {
+    void updatePiecePosition(int startRank, int startFile, int endRank, int endFile, int playerId, Piece startPiece, Piece endPiece) {
         if (endPiece != null) {
             ArrayList<Piece> componentPieces = 1 - playerId == WHITE ? whitePieces : blackPieces;
             componentPieces.remove(endPiece);
@@ -249,7 +253,7 @@ public class Board {
     /**
      * Restore pieces after a move to before the move
      */
-    private void restorePiecePosition(int startRank, int startFile, int endRank, int endFile, int playerId, Piece startPiece, Piece endPiece) {
+    void restorePiecePosition(int startRank, int startFile, int endRank, int endFile, int playerId, Piece startPiece, Piece endPiece) {
         if (endPiece != null) {
             ArrayList<Piece> componentPieces = 1 - playerId == WHITE ? whitePieces : blackPieces;
             componentPieces.add(endPiece);

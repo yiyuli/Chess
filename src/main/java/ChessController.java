@@ -4,13 +4,13 @@ import java.awt.event.ActionListener;
 
 public class ChessController {
     private ChessController controller = this;
-    private Board board;
     private JFrame frame;
     private boolean game_started = false;
     private int whiteScore = 0;
     private int blackScore = 0;
     private CommandManager commandManager = new CommandManager();
 
+    Board board;
     ChessView view;
     JButton pieceToMove = new JButton();
     int currentPlayer;
@@ -76,8 +76,8 @@ public class ChessController {
                     int startFile = pieceToMovePosition % 8;
                     int endRank = 7 - pieceMovedPosition / 8;
                     int endFile = pieceMovedPosition % 8;
-                    if (board.movePiece(startRank, startFile, endRank, endFile, currentPlayer)) {
-                        commandManager.executeCommand(new MovePieceCommand(controller, button));
+                    if (board.canMovePiece(startRank, startFile, endRank, endFile, currentPlayer)) {
+                        commandManager.executeCommand(new MovePieceCommand(controller, button, startRank, startFile, endRank, endFile));
                         /*
                         button.setIcon(pieceToMove.getIcon());
                         pieceToMove.setIcon(null);
